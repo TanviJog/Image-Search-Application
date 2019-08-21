@@ -1,0 +1,64 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes" access="global" controller="imageSearchEngine">
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+	<aura:attribute name="lstPhotos" type="Photograph__c[]"/>
+    <aura:attribute name="strTitle" type="String" default=""/>
+    <aura:attribute name="strEmailAddress" type="String" default=""/>
+    <aura:attribute name="strEmailSendSuccessMsg" type="String" default=""/>
+    <aura:attribute name="isPostBack" type="boolean" default="false"/>
+    <div Class="slds-page-header--object-home slds-page-header_joined slds-page-header_bleed slds-page-header slds-shrink-none test-headerRegion forceListViewManagerHeader">
+        <label style="font-size: 1.125rem;font-family: 'Salesforce Sans',Arial,sans-serif;font-weight: 700;">Photo Album</label>        
+        <div class="slds-form-element slds-form-element_horizontal slds-form-element_1-col" style="border: 1px solid rgb(221, 219, 218);padding: 1%;">
+        	<label class="slds-form-element__label" style="font-size: .8125rem;font-family: 'Salesforce Sans',Arial,sans-serif;margin-bottom: 1.5%;">Search by Photo Title</label>
+            <div style="display: inline-block;width: 100%;">
+                <div style="display:inline-block;margin: 0;padding: 0;width:30%;">
+                <lightning:input type="string" label="Title" value="{!v.strTitle}" required="true"/>
+                </div>
+                <div style="display:inline-block;margin: 0;padding: 0;width:5.6%;margin-left: 5px;">
+                <ui:button label="Search" press="{!c.myAction}"/>
+                </div>
+                <div style="display:inline-block;margin: 0;padding: 0;width:10%;">
+                <ui:button label="Refresh" press="{!c.refresh}"/>
+                </div>                
+            </div>
+        </div>
+        <div style="border: 1px solid rgb(221, 219, 218);padding: 1%;">
+            <div>
+            <label style="display: inline-block;color: maroon;font-size: .70rem;">(Multiple Email Addresses not allowed)</label>
+            </div>
+            <div style="display:inline-block;margin: 0;padding: 0;width:100%;">
+            <div style="display:inline-block;margin: 0;padding: 0;width:30%;">
+                <lightning:input type="string" label="Email Address" value="{!v.strEmailAddress}" required="true"/>
+            </div>
+            <div style="display:inline-block;margin: 0;padding: 0;width:8%;margin-left: 5px;">
+                <!--<lightning:button variant="base" label="Send Email" title="Send Email" onclick="{!c.sendEmail}"/>-->
+                <ui:button label="Send Email" press="{!c.sendEmail}"/>
+            </div>
+            <div style="display:inline-block;margin: 0;padding: 0;width:30%;">
+                <label style="margin-left: 2%;display: inline-block;color: maroon;font-size: .70rem;">{!v.strEmailSendSuccessMsg}</label>
+            </div>
+            </div>
+        </div>
+        <!--<aura:iteration var="img" items="{!v.lstPhotos}">
+            <div class="slds-grid slds-gutters">
+                <div class="slds-col">
+                    <p>{!img.id}</p>
+                    <p>{!img.Name}</p>
+                    <p>{!img.Image_Title__c}</p>
+                    <p><img src="{!img.Photo_URL__c}" style="width: 9%;"/></p>
+                </div>        
+            </div>
+        </aura:iteration>-->
+        <div style="background-color: rgb(250, 250, 249);">
+        <lightning:layout multipleRows="true" horizontalAlign="spread">
+            <aura:iteration items="{!v.lstPhotos}" var="img">
+                <lightning:layoutItem padding="around-large" size="3">
+                    <!--<p>{!img.id}</p>-->
+                    <!--<p>{!img.Name}</p>-->
+                    <p>{!img.Image_Title__c}</p>
+                    <p><img src="{!img.Photo_URL__c}" style="width: 15%;"/></p>
+                </lightning:layoutItem>
+            </aura:iteration>
+        </lightning:layout>
+        </div>
+    </div>
+</aura:component>

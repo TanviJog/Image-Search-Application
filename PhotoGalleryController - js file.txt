@@ -1,0 +1,77 @@
+({
+	myAction : function(component, event, helper) {
+		var action = component.get("c.getSearchedPhotographs");
+        action.setParams({"searchCriteria" : component.get("v.strTitle")});
+        action.setCallback(this, function(response){
+            var name = response.getState();
+            if (name === "SUCCESS") {
+                component.set("v.lstPhotos", response.getReturnValue());
+            }
+        });
+        $A.enqueueAction(action);
+	},
+    
+    sendEmail : function(component, event, helper) {
+        //alert('Entered in sendEmail function'); 
+        //alert('Email address ' + component.get("v.strEmailAddress")); 
+		var action = component.get("c.sendResultsEmail");
+        action.setParams({
+            txtEmailAddress:component.get("v.strEmailAddress"),
+            lstSearchResult: component.get("v.lstPhotos")
+        }); 
+        action.setCallback(this, function(response){
+            var name = response.getState();
+            //alert('Response state: '+response.getState());
+            //alert('Response return value: '+response.getReturnValue());             
+            if (name === "SUCCESS") {
+                //Resolution found when googled for error Uncaught AuraClientService.postProcess: error in processing [Maximum call stack size exceeded]
+                //Not sure how this v.task works
+                //Root cause of this issue found is multiple calls to server side method which 
+                //Multiple calls to server method is happening due to same method name both server side and client side controllers
+                //Strange issue!!Good learning!
+                /*var emptyTask = component.get("v.task");
+                emptyTask.Subject = "";
+                emptyTask.Description = ""; 
+                component.set("v.task", emptyTask);*/
+                //---------------------------------------------------------------------------------------------------------------
+                component.set("v.strEmailSendSuccessMsg", response.getReturnValue());
+            }
+        });
+        $A.enqueueAction(action);
+	},
+    
+    doInit: function(component) {
+        var action = component.get("c.getAllPhotographs");
+        action.setCallback(this, function(response){
+            var name = response.getState();
+            if (name === "SUCCESS") {
+                var isPostBack = component.get("v.isPostBack");
+                if(!isPostBack){
+                    component.set("v.lstPhotos", response.getReturnValue());
+                    //Looking for option similar to outputpanels in VF but unable to find similar component. 
+                    //As a workaround using this old school method to identify page postbacks.
+                    component.set("v.isPostBack", true); 
+                }               
+            }
+        });
+        $A.enqueueAction(action);
+    },
+    
+    refresh : function(component, event, helper) {
+    //Need code optimization to avoid this unnecessary server call to method getSearchedPhotographs. 
+    //Storing data in cache is one option I am aware of but not sure how to implement and need some more time to explore.
+    var action = component.get("c.getSearchedPhotographs");         
+    action.setCallback(component,
+        function(response) {
+            var state = response.getState();
+            if (state === 'SUCCESS'){
+                $A.get('e.force:refreshView').fire();
+                //component.set("v.lstPhotos", response.getReturnValue());
+                //component.set("v.isPostBack", false);
+                //component.set("v.strTitle", '');
+            } 
+        }
+    );
+    $A.enqueueAction(action);
+}
+})
